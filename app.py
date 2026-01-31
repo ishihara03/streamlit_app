@@ -10,11 +10,28 @@ df = df.iloc[:, 1:7]
 
 st.title('食料需給データ分析')
 
-st.subheader('食料総取得量')
-fig = px.bar(df, x='年度', y=['国内生産量【1000トン】', '外国貿易_輸入量【1000トン】'], title='日本の食料総取得量')
-st.plotly_chart(fig)
-st.subheader('食料総消費量')
-fig = px.bar(df, x='年度', y=['国内消費志向量【1000トン】', '外国貿易_輸出量【1000トン】'], title='日本の食料総消費量')
-st.plotly_chart(fig)
+df['食料自給率（%）'] = (df['国内生産量【1000トン】'] / df['国内消費仕向量【1000トン】'] *100)
 
-st.dataframe(df)
+with st.sidebar:
+  st.write('表示するデータを選択してください'),
+  selected1 = st.checkbox('食料総取得量', value=True)
+  selected2 = st.checkbox('食料総消費量', value=True)
+  selected3 = st.checkbox('食料自給率', value=True)
+  selected4 = st.checkbox('全データの表', value=False)
+
+#グラフ描画（サイドバーの入力で表示を切り替え）
+if selected1:
+  fig = px.bar(df, x='年度', y=['国内生産量【1000トン】', '外国貿易_輸入量【1000トン】'], title='日本の食料総取得量')
+  st.plotly_chart(fig)
+if selected2:
+  fig = px.bar(df, x='年度', y=['国内消費仕向量【1000トン】', '外国貿易_輸出量【1000トン】'], title='日本の食料総消費量')
+  st.plotly_chart(fig)
+if selected3:  
+  fig = px.line(df, x='年度', y='食料自給率（%）', title='日本の食料自給率（%）')
+  st.plotly_chart(fig)
+
+#使用したデータの表示
+if selected4:
+  st.dataframe(df)
+  with st.expander('使用したデータ'):
+    st.write('https://www.e-stat.go.jp/stat-search?page=1&query=%E9%A3%9F%E6%96%99%E8%87%AA%E7%B5%A6%E7%8E%87&layout=dataset&toukei=00500300&bunya_l=04&metadata=1&data=1')
